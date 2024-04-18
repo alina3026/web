@@ -92,8 +92,10 @@ async def game(update, context):
         )
         if update.message.text == result[0][5]:
             await update.message.reply_text(f'{update.message.text} - правильный ответ! Вам начислен 1 балл')
+            points += 1
         else:
-            await update.message.reply_text('К сожалению это неверно(...')
+            update.message.reply_text('К сожалению это неверно(...')
+            points -= 1
         break
 
 async def site(update, context):
