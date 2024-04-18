@@ -24,10 +24,11 @@ markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
 
 async def start(update, context):
     await update.message.reply_text(
-        "Я бот-справочник. Какая информация вам нужна?",
-        reply_markup=markup
+        "Привет! Это бот квизов. Чтобы начать новую игру введи ник.",
+        reply_markup=ReplyKeyboardRemove()
     )
-
+    global k
+    k = 1
 
 async def close_keyboard(update, context):
     await update.message.reply_text(
@@ -37,8 +38,12 @@ async def close_keyboard(update, context):
 
 
 async def echo(update, context):
-    await update.message.reply_text(f'Я получил сообщение {update.message.text}')
-
+    global k
+    if k == 1:
+        await update.message.reply_text(f'Пользователь {update.message.text} зарегистирован!')
+        k = 0
+    else:
+        await update.message.reply_text("Выбери ответ из предложенных!")
 
 async def help(update, context):
     await update.message.reply_text(
@@ -69,23 +74,12 @@ def main():
     # Вместо слова "TOKEN" надо разместить полученный от @BotFather токен
     application = Application.builder().token(BOT_TOKEN).build()
 
-    # async def start(update, context):
-    #     """Отправляет сообщение когда получена команда /start"""
-    #     user = update.effective_user
-    #     await update.message.reply_html(
-    #         rf"Привет {user.mention_html()}! Я эхо-бот. Напишите мне что-нибудь, и я пришлю это назад!",
-    #     )
-
-    # async def help_command(update, context):
-    #     """Отправляет сообщение когда получена команда /help"""
-    #     await update.message.reply_text("Я пока не умею помогать... Я только ваше эхо.")
 
     # Зарегистрируем их в приложении перед
     # регистрацией обработчика текстовых сообщений.
     # Первым параметром конструктора CommandHandler я
     # вляется название команды.
     application.add_handler(CommandHandler("start", start))
-    # application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("address", address))
     application.add_handler(CommandHandler("phone", phone))
     application.add_handler(CommandHandler("site", site))
