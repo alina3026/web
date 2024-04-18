@@ -18,9 +18,9 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-reply_keyboard = [['/address', '/phone'],
-                  ['/site', '/work_time']]
-markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+# reply_keyboard = [['/address', '/phone'],
+#                   ['/site', '/work_time']]
+# markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
 
 
 async def start(update, context):
@@ -28,9 +28,11 @@ async def start(update, context):
         "Привет! Это бот квизов. Чтобы начать новую игру введи ник.",
         reply_markup=ReplyKeyboardRemove()
     )
-    global user_in
     user_in = 1
 
+    with open("level.txt", "a+") as my_file:
+        my_file.write('@')
+        my_file.write(str(user_in))
 
 async def close_keyboard(update, context):
     await update.message.reply_text(
@@ -40,11 +42,17 @@ async def close_keyboard(update, context):
 
 
 async def echo(update, context):
-    global user_in
+    with open("level.txt", "r+") as my_file:
+        x = my_file.read().split('@')[-1]
+        user_in = int(x[0])
+
     if user_in == 1:
         await update.message.reply_text(
             f'Пользователь {update.message.text} зарегистирован! Нажми "/game", чтобы начать игру')
         user_in = 0
+        with open("level.txt", "a+") as my_file:
+            my_file.write('@')
+            my_file.write(str(user_in))
 
         # connection = sqlite3.connect('tg_bot.sqlite')
         # cursor = connection.cursor()
@@ -54,8 +62,8 @@ async def echo(update, context):
         # connection.commit()
         # connection.close()
 
-    else:
-        await update.message.reply_text("Выбери ответ из предложенных!")
+    # else:
+    #     await update.message.reply_text("Выбери ответ из предложенных!")
 
 
 async def help(update, context):
@@ -64,10 +72,7 @@ async def help(update, context):
 
 
 async def game(update, context):
-    global user_in
     points = 2
-    # await update.message.reply_text(
-    #     "Адрес: г. Москва, ул. Льва Толстого, 16")
     while points != 0:
         connection = sqlite3.connect('tg_bot.sqlite')
         cursor = connection.cursor()
@@ -91,12 +96,7 @@ async def site(update, context):
         "Сайт: http://www.yandex.ru/company")
 
 
-
-
-
 def main():
-    # Создаём объект Application.
-    # Вместо слова "TOKEN" надо разместить полученный от @BotFather токен
     application = Application.builder().token(BOT_TOKEN).build()
 
     # Зарегистрируем их в приложении перед
@@ -114,14 +114,17 @@ def main():
     # После регистрации обработчика в приложении
     # эта асинхронная функция будет вызываться при получении сообщения
     # с типом "текст", т. е. текстовых сообщений.
-    if user_in == 1:
-        text_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, echo)
-        # Регистрируем обработчик в приложении.
-        application.add_handler(text_handler)
+    with open("level.txt", "r+") as my_file:
+        x = my_file.read().split('@')[-1]
+        user_in = int(x[0])
+        if user_in == 1:
+            text_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, echo)
+            # Регистрируем обработчик в приложении.
+            application.add_handler(text_handler)
 
-    # Запускаем приложение.
+
+# Запускаем приложение.
     application.run_polling()
-
 
 # Запускаем функцию main() в случае запуска скрипта.
 if __name__ == '__main__':
