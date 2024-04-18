@@ -18,6 +18,7 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+
 # reply_keyboard = [['/address', '/phone'],
 #                   ['/site', '/work_time']]
 # markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
@@ -33,6 +34,7 @@ async def start(update, context):
     with open("level.txt", "a+") as my_file:
         my_file.write('@')
         my_file.write(str(user_in))
+
 
 async def close_keyboard(update, context):
     await update.message.reply_text(
@@ -88,8 +90,11 @@ async def game(update, context):
             result[0][0],
             reply_markup=markup
         )
+        if update.message.text == result[0][5]:
+            await update.message.reply_text(f'{update.message.text} - правильный ответ! Вам начислен 1 балл')
+        else:
+            await update.message.reply_text('К сожалению это неверно(...')
         break
-
 
 async def site(update, context):
     await update.message.reply_text(
@@ -119,13 +124,14 @@ def main():
         user_in = int(x[0])
         if user_in == 1:
             text_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, echo)
-            # Регистрируем обработчик в приложении.
+            application.add_handler(text_handler)
+        else:
+            text_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, game)
             application.add_handler(text_handler)
 
-
-# Запускаем приложение.
+    # Запускаем приложение.
     application.run_polling()
 
-# Запускаем функцию main() в случае запуска скрипта.
+
 if __name__ == '__main__':
     main()
