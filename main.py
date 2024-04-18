@@ -1,14 +1,14 @@
 import logging
 from telegram.ext import Application, MessageHandler, filters
 from telegram.ext import CommandHandler
+from telegram import ReplyKeyboardMarkup
+from telegram import ReplyKeyboardRemove
 from telegram.ext import ApplicationBuilder
 
 # proxy_url = "socks5://user:pass@host:port"
 #
 # app = ApplicationBuilder().token("TOKEN").proxy_url(proxy_url).build()
 BOT_TOKEN = '6533161431:AAH_iqGGFB5Ulk75XwXgdwa4zM16e5ccYJs'
-
-
 
 # Запускаем логгирование
 logging.basicConfig(
@@ -17,9 +17,51 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+reply_keyboard = [['/address', '/phone'],
+                  ['/site', '/work_time']]
+markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+
+
+async def start(update, context):
+    await update.message.reply_text(
+        "Я бот-справочник. Какая информация вам нужна?",
+        reply_markup=markup
+    )
+
+
+async def close_keyboard(update, context):
+    await update.message.reply_text(
+        "Ok",
+        reply_markup=ReplyKeyboardRemove()
+    )
+
 
 async def echo(update, context):
     await update.message.reply_text(f'Я получил сообщение {update.message.text}')
+
+
+async def help(update, context):
+    await update.message.reply_text(
+        "Я бот справочник.")
+
+
+async def address(update, context):
+    await update.message.reply_text(
+        "Адрес: г. Москва, ул. Льва Толстого, 16")
+
+
+async def phone(update, context):
+    await update.message.reply_text("Телефон: +7(495)776-3030")
+
+
+async def site(update, context):
+    await update.message.reply_text(
+        "Сайт: http://www.yandex.ru/company")
+
+
+async def work_time(update, context):
+    await update.message.reply_text(
+        "Время работы: круглосуточно.")
 
 
 def main():
@@ -27,23 +69,29 @@ def main():
     # Вместо слова "TOKEN" надо разместить полученный от @BotFather токен
     application = Application.builder().token(BOT_TOKEN).build()
 
-    async def start(update, context):
-        """Отправляет сообщение когда получена команда /start"""
-        user = update.effective_user
-        await update.message.reply_html(
-            rf"Привет {user.mention_html()}! Я эхо-бот. Напишите мне что-нибудь, и я пришлю это назад!",
-        )
+    # async def start(update, context):
+    #     """Отправляет сообщение когда получена команда /start"""
+    #     user = update.effective_user
+    #     await update.message.reply_html(
+    #         rf"Привет {user.mention_html()}! Я эхо-бот. Напишите мне что-нибудь, и я пришлю это назад!",
+    #     )
 
-    async def help_command(update, context):
-        """Отправляет сообщение когда получена команда /help"""
-        await update.message.reply_text("Я пока не умею помогать... Я только ваше эхо.")
+    # async def help_command(update, context):
+    #     """Отправляет сообщение когда получена команда /help"""
+    #     await update.message.reply_text("Я пока не умею помогать... Я только ваше эхо.")
 
     # Зарегистрируем их в приложении перед
     # регистрацией обработчика текстовых сообщений.
     # Первым параметром конструктора CommandHandler я
     # вляется название команды.
     application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("help", help_command))
+    # application.add_handler(CommandHandler("help", help_command))
+    application.add_handler(CommandHandler("address", address))
+    application.add_handler(CommandHandler("phone", phone))
+    application.add_handler(CommandHandler("site", site))
+    application.add_handler(CommandHandler("work_time", work_time))
+    application.add_handler(CommandHandler("help", help))
+    application.add_handler(CommandHandler("close", close_keyboard))
 
     # Создаём обработчик сообщений типа filters.TEXT
     # из описанной выше асинхронной функции echo()
@@ -54,7 +102,6 @@ def main():
     text_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, echo)
     # Регистрируем обработчик в приложении.
     application.add_handler(text_handler)
-
 
     # Запускаем приложение.
     application.run_polling()
