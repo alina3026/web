@@ -1,6 +1,8 @@
 import os
 import sqlite3
 import logging
+import random
+
 from telegram.ext import Application, MessageHandler, filters
 from telegram.ext import CommandHandler
 from telegram import ReplyKeyboardMarkup
@@ -70,41 +72,71 @@ async def echo(update, context):
     #     await update.message.reply_text("Выбери ответ из предложенных!")
 
 
+async def check_answer(update, context):
+    global result
+    global points
+    with open("level.txt", "r+") as my_file:
+        x = my_file.read().split('@')[-1]
+        user_in = x[0]
+        if x[0] == 'Q':
+            if update.message.text == result[0][5]:
+                await update.message.reply_text(f'{update.message.text} - правильный ответ! Вам начислен 1 балл')
+                points += 1
+            else:
+                await update.message.reply_text('К сожалению это неверно(...')
+                points -= 1
+            with open("level.txt", "a+") as my_file:
+                my_file.write('@')
+                my_file.write('A')
+
+
 async def help(update, context):
     await update.message.reply_text(
         "Я бот справочник.")
 
 
 async def game(update, context):
+    global points
+    global result
     points = 2
+    with open("level.txt", "a+") as my_file:
+        my_file.write('@')
+        my_file.write('A')
     while points != 0:
         connection = sqlite3.connect('tg_bot.sqlite')
         cursor = connection.cursor()
+        id_id = random.randint(1, 3)
         result = cursor.execute(
-            """SELECT ques, ans1, ans2, ans3, ans4, true_ans FROM questions ORDER BY RANDOM() limit 1""").fetchall()
+            """SELECT ques, ans1, ans2, ans3, ans4, true_ans FROM questions WHERE id = ?""", (id_id,)).fetchall()
+        # result = cursor.execute(
+        #     """SELECT ques, ans1, ans2, ans3, ans4, true_ans FROM questions ORDER BY RANDOM() limit 1""").fetchall()
         connection.commit()
         connection.close()
 
-        reply_keyboard = [[f'{result[0][1]}'], [f'{result[0][2]}'],
-                          [f'{result[0][3]}'], [f'{result[0][4]}']]
-        markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
-        with open("level.txt", "a+") as my_file:
-            my_file.write('@')
-            my_file.write('Q')
-        await update.message.reply_text(
-            result[0][0],
-            reply_markup=markup
-        )
         with open("level.txt", "r+") as my_file:
             x = my_file.read().split('@')[-1]
             user_in = x[0]
-            if x[0] != 'Q':
-                if update.message.text == result[0][5]:
-                    await update.message.reply_text(f'{update.message.text} - правильный ответ! Вам начислен 1 балл')
-                    points += 1
-                else:
-                    await update.message.reply_text('К сожалению это неверно(...')
-                    points -= 1
+            if user_in == 'A':
+                reply_keyboard = [[f'{result[0][1]}'], [f'{result[0][2]}'],
+                                  [f'{result[0][3]}'], [f'{result[0][4]}']]
+                markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+                with open("level.txt", "a+") as my_file:
+                    my_file.write('@')
+                    my_file.write('Q')
+                await update.message.reply_text(
+                    result[0][0],
+                    reply_markup=markup
+                )
+        # with open("level.txt", "r+") as my_file:
+        #     x = my_file.read().split('@')[-1]
+        #     user_in = x[0]
+        #     if x[0] != 'Q':
+        #         if update.message.text == result[0][5]:
+        #             await update.message.reply_text(f'{update.message.text} - правильный ответ! Вам начислен 1 балл')
+        #             points += 1
+        #         else:
+        #             await update.message.reply_text('К сожалению это неверно(...')
+        #             points -= 1
 
 
 async def site(update, context):
@@ -136,10 +168,12 @@ def main():
         if user_in == '1':
             text_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, echo)
             application.add_handler(text_handler)
-        elif user_in != 'Q':
+        elif user_in == 'Q':
+            text_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, check_answer)
+            application.add_handler(text_handler)
+        elif user_in == 'A':
             text_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, game)
             application.add_handler(text_handler)
-
     # Запускаем приложение.
     application.run_polling()
 
