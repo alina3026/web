@@ -1,3 +1,4 @@
+import os
 import sqlite3
 import logging
 from telegram.ext import Application, MessageHandler, filters
@@ -30,6 +31,7 @@ async def start(update, context):
         reply_markup=ReplyKeyboardRemove()
     )
     user_in = 1
+    # os.system(r'nul>level.txt')
 
     with open("level.txt", "a+") as my_file:
         my_file.write('@')
@@ -46,9 +48,9 @@ async def close_keyboard(update, context):
 async def echo(update, context):
     with open("level.txt", "r+") as my_file:
         x = my_file.read().split('@')[-1]
-        user_in = int(x[0])
+        user_in = x[0]
 
-    if user_in == 1:
+    if user_in == '1':
         await update.message.reply_text(
             f'Пользователь {update.message.text} зарегистирован! Нажми "/game", чтобы начать игру')
         user_in = 0
@@ -80,23 +82,30 @@ async def game(update, context):
         cursor = connection.cursor()
         result = cursor.execute(
             """SELECT ques, ans1, ans2, ans3, ans4, true_ans FROM questions ORDER BY RANDOM() limit 1""").fetchall()
-
         connection.commit()
         connection.close()
+
         reply_keyboard = [[f'{result[0][1]}'], [f'{result[0][2]}'],
                           [f'{result[0][3]}'], [f'{result[0][4]}']]
         markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+        with open("level.txt", "a+") as my_file:
+            my_file.write('@')
+            my_file.write('Q')
         await update.message.reply_text(
             result[0][0],
             reply_markup=markup
         )
-        if update.message.text == result[0][5]:
-            await update.message.reply_text(f'{update.message.text} - правильный ответ! Вам начислен 1 балл')
-            points += 1
-        else:
-            update.message.reply_text('К сожалению это неверно(...')
-            points -= 1
-        break
+        with open("level.txt", "r+") as my_file:
+            x = my_file.read().split('@')[-1]
+            user_in = x[0]
+            if x[0] != 'Q':
+                if update.message.text == result[0][5]:
+                    await update.message.reply_text(f'{update.message.text} - правильный ответ! Вам начислен 1 балл')
+                    points += 1
+                else:
+                    await update.message.reply_text('К сожалению это неверно(...')
+                    points -= 1
+
 
 async def site(update, context):
     await update.message.reply_text(
@@ -123,11 +132,11 @@ def main():
     # с типом "текст", т. е. текстовых сообщений.
     with open("level.txt", "r+") as my_file:
         x = my_file.read().split('@')[-1]
-        user_in = int(x[0])
-        if user_in == 1:
+        user_in = x[0]
+        if user_in == '1':
             text_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, echo)
             application.add_handler(text_handler)
-        else:
+        elif user_in != 'Q':
             text_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, game)
             application.add_handler(text_handler)
 
