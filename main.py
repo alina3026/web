@@ -127,11 +127,14 @@ async def game(update, context):
             x = my_file.read().split('@')[-1]
             user_in = x[0]
             if user_in == 'Q':
+                # await update.message.answer ==
                 if update.message.text == result[0][5]:
-                    await update.message.reply_text(f'{update.message.text} - правильный ответ! Вам начислен 1 балл')
+                    await update.message.answer(text=f'{update.message.text} - правильный ответ! Вам начислен 1 балл')
+                    # await update.message.reply_text(f'{update.message.text} - правильный ответ! Вам начислен 1 балл')
                     points += 1
                 else:
-                    await update.message.reply_text('К сожалению это неверно(...')
+                    # await update.message.reply_text('К сожалению это неверно(...')
+                    await update.message.answer(text='К сожалению это неверно(...')
                     points -= 1
                 with open("level.txt", "a+") as my_file:
                     my_file.write('@')
@@ -167,7 +170,7 @@ def main():
         if user_in == '1':
             text_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, echo)
             application.add_handler(text_handler)
-        elif user_in == 'A':
+        elif user_in != '0':
             text_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, game)
             application.add_handler(text_handler)
         # elif user_in == 'Q':
