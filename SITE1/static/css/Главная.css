@@ -78,8 +78,10 @@
 }
 
 .u-section-1 .u-image-1 {
-  min-height: 691px;
-  background-image: url("images/xx-min.jpg");
+  min-height: 600px;
+  max-height: 600px;
+  float: right;
+  background-image: url("{{url_for('static', filename='images/xx-min.jpg')}}");
   background-position: 50% 50%;
   --animation-custom_in-translate_x: 300px;
   --animation-custom_in-translate_y: 0px;

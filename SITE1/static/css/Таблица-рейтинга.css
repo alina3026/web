@@ -1,5 +1,5 @@
  .u-section-1 {
-  background-image: linear-gradient(0deg, rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('images/2024-04-2013.47.271.jpg');
+  background-image: linear-gradient(0deg, rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url("{{url_for('static', filename='images/2024-04-2013.47.271.jpg')}}");
   background-position: 50% 50%;
 }
 
