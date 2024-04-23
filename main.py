@@ -55,17 +55,23 @@ async def help(update, context):
         "Я бот справочник.")
 
 
-async def new_question():
+async def new_question(update):
     connection = sqlite3.connect('tg_bot.sqlite')
     cursor = connection.cursor()
-    id_id = random.randint(1, 16)
+    id_id = random.randint(1, 15)
     result = cursor.execute("""SELECT ques, ans1, ans2, ans3, ans4, true_ans FROM questions WHERE id = ?""",
                             (id_id,)).fetchall()
     connection.commit()
     connection.close()
-    if result:
-        return result
-    print('Из БД пустота')
+    await update.message.reply_text(f'{result[0][0]}')
+    reply_keyboard = [[f'{result[0][1]}'], [f'{result[0][2]}'],
+                      [f'{result[0][3]}'], [f'{result[0][4]}']]
+    markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+    await update.message.reply_text(
+        result[0][0],
+        reply_markup=markup
+    )
+    # true_answer(result[0][5])
 
 
 def check_points():
@@ -80,7 +86,7 @@ async def points_change(delta=0):
 
 
 async def check_ans(update, answer='', ans1='', ans2='', ans3='', ans4='', true_answer=''):
-    print('Ответ проверили', answer, true_answer)
+    print('Ответ проверили', answer, true_answer, ans1, ans2, ans3, ans4)
     if answer == true_answer:
         print('Ответ дан правильный')
         await update.message.reply_text(f'{update.message.text} - правильный ответ! Вам начислен 1 балл')
@@ -148,16 +154,16 @@ async def game(update, context):
     if quiz['game_mode'] == 2:
         print('Режим проверки ответа')
         # quiz['game_mode'] = 1
-        # if not (true_answer()):
-        #     await new_question()
-        # else:
-        answer = update.message.text
-        print(f'Ответ пользователя: {answer}')
-        await check_ans(update, answer, quiz['ans1'], quiz['ans2'], quiz['ans3'], quiz['ans4'], true_answer())
+        if not (true_answer()):
+            await new_question(update)
+        else:
+            answer = update.message.text
+            print(f'Ответ пользователя: {answer}')
+            await check_ans(update, answer, quiz['ans1'], quiz['ans2'], quiz['ans3'], quiz['ans4'], true_answer())
         if check_points():
-            # await new_question()
+            await new_question(update)
             print("Проверили, баллов достаточно")
-            quiz['game_mode'] = 1
+            # quiz['game_mode'] = 1
         else:
             await stop(update, context)
 
