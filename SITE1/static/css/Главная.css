@@ -78,10 +78,11 @@
 }
 
 .u-section-1 .u-image-1 {
-  min-height: 100px;
-  max-height: 400px;
+  max-height: 691px;
+  max-width: 691px;
+  position: relative;
   float: right;
-  background-image: url("{{url_for('static', filename='images/xx-min.jpg')}}");
+  background-image: url("static/images/glavn.jpg");
   background-position: 50% 50%;
   --animation-custom_in-translate_x: 300px;
   --animation-custom_in-translate_y: 0px;
@@ -129,6 +130,9 @@
     margin-right: 82px;
     margin-left: 0;
     width: 400px;
+    min-width: 400px;
+    float: left;
+    overflow: scroll;
   }
 
   .u-section-1 .u-btn-1 {

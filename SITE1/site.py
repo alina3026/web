@@ -1,6 +1,14 @@
 from flask import Flask, render_template
+import sqlalchemy
+from sqlalchemy import orm
+
+# from .db_session import SqlAlchemyBase
 
 app = Flask(__name__)
+
+
+# class UsersTabl(SqlAlchemyBase):
+#     __tablename__ = 'users'
 
 
 @app.route('/')
