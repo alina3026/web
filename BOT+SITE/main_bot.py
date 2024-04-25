@@ -9,6 +9,8 @@ from telegram import ReplyKeyboardMarkup
 from telegram import ReplyKeyboardRemove
 from telegram.ext import ApplicationBuilder
 
+from map import send_Img
+
 tracemalloc.start()
 # proxy_url = "socks5://user:pass@host:port"
 #
@@ -26,18 +28,12 @@ async def start(update, context):
     quiz['game_mode'] = 0
     quiz['points'] = 2
     quiz['counts_questions'] = 5
+    quiz['bot_mode'] = 0
     await points_change()
     await update.message.reply_text(
         "Привет! Это бот квизов. Чтобы начать новую игру введи ник.",
         reply_markup=ReplyKeyboardRemove()
     )
-
-
-# async def close_keyboard(update, context):
-#     await update.message.reply_text(
-#         "Ok",
-#         reply_markup=ReplyKeyboardRemove()
-#     )
 
 
 def register(name=''):
@@ -52,29 +48,8 @@ def register(name=''):
 
 async def help(update, context):
     await update.message.reply_text(
-        "Я бот справочник.")
-
-
-# async def new_question(update):
-#     connection = sqlite3.connect('tg_bot.sqlite')
-#     cursor = connection.cursor()
-#     id_id = random.randint(1, 15)
-#     result = cursor.execute("""SELECT ques, ans1, ans2, ans3, ans4, true_ans FROM questions WHERE id = ?""",
-#                             (id_id,)).fetchall()
-#     connection.commit()
-#     connection.close()
-#     if result:
-#         return result
-#     print('Из БД пустота')
-#     await update.message.reply_text(f'{result[0][0]}')
-#     reply_keyboard = [[f'{result[0][1]}'], [f'{result[0][2]}'],
-#                       [f'{result[0][3]}'], [f'{result[0][4]}']]
-#     markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
-#     await update.message.reply_text(
-#         result[0][0],
-#         reply_markup=markup
-#     )
-# true_answer(result[0][5])
+        "Я бот с интересными вопросами. Отвечай на них - зарабатывай баллы! Чтобы начать нажми /start. "
+        "Если хочешь испугаться, нажми /address!")
 
 
 def check_points():
@@ -92,18 +67,11 @@ async def points_change(delta=0):
 
 
 async def check_ans(update, answer='', answer_options='', true_answer=''):
-    # print('Ответ проверили:', answer, true_answer)
-    print('ответ Юзера:', answer, "Правильный ответ:", true_answer, "Варианты:", answer_options)
     if answer == true_answer:
-        print('Ответ дан правильный')
         await update.message.reply_text(f'{update.message.text} - правильный ответ! Вам начислен 1 балл')
         await points_change(1)
     elif answer in answer_options:
-        print('Ответ дан неправильный')
         await update.message.reply_text('К сожалению это неверно(...')
-        # await points_change(-1)
-    else:
-        print('странно')
 
 
 def game_mode():
@@ -136,6 +104,10 @@ def answer_options(ans1='', ans2='', ans3='', ans4=''):
 
 async def game(update, context):
     quiz = context.bot_data
+    if quiz['bot_mode'] == 1:
+        adr = update.message.text
+        quiz['bot_mode'] = 0
+        await check_address(update, context, adr)
     if quiz['game_mode'] == 0:
         quiz['nick'] = update.message.text
         print('Регистрируем пользователя', quiz['nick'])
@@ -143,9 +115,6 @@ async def game(update, context):
         register(quiz['nick'])
         print(quiz)
     if quiz['game_mode'] == 1:
-        # print('Пошла игра для ' + quiz['nick'])
-        quiz['game_mode'] = 2
-        # result = new_question()
         connection = sqlite3.connect('tg_bot.sqlite')
         cursor = connection.cursor()
         id_id = random.randint(1, 15)
@@ -160,37 +129,23 @@ async def game(update, context):
         quiz['ans4'] = result[0][4]
         reply_keyboard = [[f'{result[0][1]}'], [f'{result[0][2]}'],
                           [f'{result[0][3]}'], [f'{result[0][4]}']]
-        quiz['counts_questions'] -= 1
+        # print('вывожу вопрос')
         markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
         await update.message.reply_text(
             result[0][0],
             reply_markup=markup
         )
+        quiz['counts_questions'] -= 1
+        quiz['degree'] = 1
+        quiz['game_mode'] = 2
     if quiz['game_mode'] == 2:
-        # print('Режим проверки ответа')
-        # quiz['game_mode'] = 1
-        # if not (true_answer()):
-        #     await new_question()
-        # else:
         answer = update.message.text
-        # print(f'Ответ пользователя: {answer}')
+        # print('вывожу результат')
         await check_ans(update, answer, answer_options(), true_answer())
-        # if not (true_answer()):
-        #     await new_question(update)
-        #     print('тру ансвер пустой')
-        # else:
-        # answer = update.message.text
-        # print(f'Ответ пользователя: {answer}')
-        # await check_ans(update, answer, quiz['ans1'], quiz['ans2'], quiz['ans3'], quiz['ans4'], true_answer())
         true_answer(quiz['true_answer'])
         answer_options(quiz['ans1'], quiz['ans2'], quiz['ans3'], quiz['ans4'])
-    # if check_points():
     if quiz['counts_questions']:
-        # await new_question()
-        # await new_question(update)
-        # print("Проверили, баллов достаточно")
         quiz['game_mode'] = 1
-        # quiz['game_mode'] = 1
     else:
         await stop(update, context)
 
@@ -216,7 +171,27 @@ async def site(update, context):
         "Сайт: http://www.yandex.ru/company")
 
 
+async def address(update, context):
+    quiz = context.bot_data
+    quiz['bot_mode'] = 1
+    await update.message.reply_text("Скучно живете? Хочется больше щекотливых эмоций и адреналина в жизни?"
+                                    " Вам к нам! Пришлите адрес своего дома, и мы отправим вам место, где вы живете! "
+                                    "(Можно любое другое!)"
+                                    " Отправьте адрес в формате: 'Город, адрес, дом'")
+
+
+async def check_address(update, context, adr):
+    print(adr)
+    try:
+        chat_id = update.effective_chat.id
+        img = send_Img(adr)
+        await context.bot.send_photo(chat_id=chat_id, photo=img)
+    except:
+        await update.message.reply_text('Карту с указанным адресом невозможно прислать')
+
+
 def main():
+    global bot_mode
     application = Application.builder().token(BOT_TOKEN).build()
 
     application.add_handler(CommandHandler("start", start))
@@ -224,6 +199,7 @@ def main():
     application.add_handler(CommandHandler("game", game))
     application.add_handler(CommandHandler("site", site))
     application.add_handler(CommandHandler("help", help))
+    application.add_handler(CommandHandler("address", address))
 
     text_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, game)
     application.add_handler(text_handler)
