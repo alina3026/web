@@ -84,12 +84,14 @@
 .u-section-3 .u-table-1 {
   margin: 0 0 60px;
   font-size: 1.875rem;
-  text-align: right;
   border: 1px solid black;
 }
 
 .u-section-3 .u-table-entity-1 {
   min-height: 100px;
+  text-align: center;
+  padding: 3px;
+  border: 1px solid white;
 }
 
 .u-block-1c4d-4 {
