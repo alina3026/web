@@ -83,25 +83,14 @@
                 <td class="u-table-cell u-table-cell-2">Имя пользователя</td>
                 <td class="u-table-cell u-table-cell-3">Количество очков</td>
               </tr>
-              <tr style="height: 65px;">
-                <td class="u-table-cell">Row 1</td>
-                <td class="u-table-cell">Description</td>
-                <td class="u-table-cell">Description</td>
-              </tr>
-              <tr style="height: 65px;">
-                <td class="u-table-cell">Row 2</td>
-                <td class="u-table-cell">Description</td>
-                <td class="u-table-cell">Description</td>
-              </tr>
-              <tr style="height: 65px;">
-                <td class="u-table-cell">Row 3</td>
-                <td class="u-table-cell">Description</td>
-                <td class="u-table-cell">Description</td>
-              </tr>
-              <tr style="height: 65px;">
-                <td class="u-table-cell">Row 4</td>
-                <td class="u-table-cell">Description</td>
-                <td class="u-table-cell">Description</td>
+              {% for row in rows %}
+                <tr>
+                  <tr style="height: 65px;">
+                  <td class="u-table-cell">{{ loop.index }}</td>
+                  <td class="u-table-cell">{{ row[0] }}</td>
+                  <td class="u-table-cell">{{ row[1] }}</td>
+                </tr>
+              {% endfor %}
               </tr>
             </tbody>
           </table>

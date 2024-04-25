@@ -17,11 +17,9 @@ app = Flask(__name__)
 # result_id = cursor.execute('SELECT * FROM users').fetchall()
 # connection.close()
 # print(result_id)
-# pystBD = [(1, 'hhdffg', 62347), (2, '678dfbjhvb ', 7), (3, 'fgggfgfg', 7373), (4, 'djuihfu', 54)]
-# pystBD.sort(key=lambda x: x[2], reverse=True)
-# print(pystBD)
 connect = sqlite3.connect('tg_bot.sqlite', check_same_thread=False)
 cur = connect.cursor()
+
 
 
 @app.route('/')
@@ -40,7 +38,7 @@ def bot():
 @app.route('/templates/Таблица-рейтинга.html')
 @app.route('/Таблица-рейтинга.html')
 def bot456():
-    cur.execute('SELECT * FROM users')
+    cur.execute('SELECT name, balls FROM users ORDER BY balls DESC')
     rows = cur.fetchall()
     rows = list(rows)
     return render_template('Таблица-рейтинга.html', rows=rows)
