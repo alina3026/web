@@ -1,61 +1,114 @@
  .u-section-1 {
-  background-image: linear-gradient(0deg, rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url("{{url_for('static', filename='images/2024-04-2013.47.271.jpg')}}");
+  background-image: url("{{url_for('static', filename='images/2024-04-2013.47.271.jpg')}}");
   background-position: 50% 50%;
 }
 
 .u-section-1 .u-sheet-1 {
-  min-height: 529px;
+  min-height: 264px;
 }
 
 .u-section-1 .u-text-1 {
   font-size: 6rem;
+  text-shadow: 0px 0px 8px rgba(128,128,128,1);
   font-weight: 700;
-  letter-spacing: 15px;
-  margin: 273px auto 0;
+  letter-spacing: 14px;
+  margin: 20px 0 0;
 }
 
 .u-section-1 .u-text-2 {
-  margin: 102px 0 16px;
+  font-size: 1.875rem;
+  margin: 53px 0 20px;
 }
 
 @media (max-width: 1199px) {
   .u-section-1 .u-sheet-1 {
-    min-height: 436px;
-  }
-
-  .u-section-1 .u-text-1 {
-    font-size: 4.5rem;
+    min-height: 218px;
   }
 }
 
 @media (max-width: 991px) {
   .u-section-1 .u-sheet-1 {
-    min-height: 334px;
+    min-height: 167px;
   }
 }
 
 @media (max-width: 767px) {
   .u-section-1 .u-sheet-1 {
-    min-height: 251px;
-  }
-
-  .u-section-1 .u-text-1 {
-    font-size: 3.75rem;
+    min-height: 125px;
   }
 }
 
 @media (max-width: 575px) {
   .u-section-1 .u-sheet-1 {
-    min-height: 158px;
+    min-height: 79px;
   }
 
   .u-section-1 .u-text-1 {
-    font-size: 3rem;
+    font-size: 1.875rem;
   }
-}.u-section-2 .u-sheet-1 {
+} .u-section-2 {
+  background-image: url("{{url_for('static', filename='images/2024-04-2013.47.271.jpg')}}");
+  background-position: 50% 58.14%;
+}
+
+.u-section-2 .u-sheet-1 {
   min-height: 400px;
 }
 
-.u-section-2 .u-text-1 {
-  margin: 60px auto;
+@media (max-width: 1199px) {
+  .u-section-2 .u-sheet-1 {
+    min-height: 330px;
+  }
+}
+
+@media (max-width: 991px) {
+  .u-section-2 .u-sheet-1 {
+    min-height: 253px;
+  }
+}
+
+@media (max-width: 767px) {
+  .u-section-2 .u-sheet-1 {
+    min-height: 190px;
+  }
+}
+
+@media (max-width: 575px) {
+  .u-section-2 .u-sheet-1 {
+    min-height: 120px;
+  }
+}.u-section-3 .u-sheet-1 {
+  min-height: 464px;
+}
+
+.u-section-3 .u-table-1 {
+  margin: 0 0 60px;
+}
+
+.u-section-3 .u-table-entity-1 {
+  min-height: 100px;
+}
+
+.u-block-1c4d-4 {
+  font-weight: 700;
+  background-image: none;
+}
+
+.u-section-3 .u-table-cell-1 {
+  font-weight: 700;
+}
+
+.u-section-3 .u-table-cell-2 {
+  font-weight: 700;
+}
+
+.u-section-3 .u-table-cell-3 {
+  font-weight: 700;
+}
+
+@media (max-width: 1199px) {
+  .u-section-3 .u-table-1 {
+    margin-right: initial;
+    margin-left: initial;
+  }
 }

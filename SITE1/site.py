@@ -1,14 +1,27 @@
+import os
+import sqlite3
 from flask import Flask, render_template
-import sqlalchemy
-from sqlalchemy import orm
 
 # from .db_session import SqlAlchemyBase
 
 app = Flask(__name__)
 
-
-# class UsersTabl(SqlAlchemyBase):
-#     __tablename__ = 'users'
+# # filename = os.path.abspath('tg_bot.sqlite')
+# connection = sqlite3.connect('tg_bot.sqlite')
+# cursor = connection.cursor()
+# # cursor.execute("""CREATE TABLE IF NOT EXISTS users(
+# #    id INTEGER PRIMARY KEY,
+# #    name TEXT,
+# #    balls INTEGER)""")
+# connection.commit()
+# result_id = cursor.execute('SELECT * FROM users').fetchall()
+# connection.close()
+# print(result_id)
+# pystBD = [(1, 'hhdffg', 62347), (2, '678dfbjhvb ', 7), (3, 'fgggfgfg', 7373), (4, 'djuihfu', 54)]
+# pystBD.sort(key=lambda x: x[2], reverse=True)
+# print(pystBD)
+connect = sqlite3.connect('tg_bot.sqlite', check_same_thread=False)
+cur = connect.cursor()
 
 
 @app.route('/')
@@ -27,7 +40,10 @@ def bot():
 @app.route('/templates/Таблица-рейтинга.html')
 @app.route('/Таблица-рейтинга.html')
 def bot456():
-    return render_template('Таблица-рейтинга.html')
+    cur.execute('SELECT * FROM users')
+    rows = cur.fetchall()
+    rows = list(rows)
+    return render_template('Таблица-рейтинга.html', rows=rows)
 
 
 if __name__ == '__main__':
