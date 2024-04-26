@@ -6,20 +6,8 @@ from flask import Flask, render_template
 
 app = Flask(__name__)
 
-# # filename = os.path.abspath('tg_bot.sqlite')
-# connection = sqlite3.connect('tg_bot.sqlite')
-# cursor = connection.cursor()
-# # cursor.execute("""CREATE TABLE IF NOT EXISTS users(
-# #    id INTEGER PRIMARY KEY,
-# #    name TEXT,
-# #    balls INTEGER)""")
-# connection.commit()
-# result_id = cursor.execute('SELECT * FROM users').fetchall()
-# connection.close()
-# print(result_id)
 connect = sqlite3.connect('tg_bot.sqlite', check_same_thread=False)
 cur = connect.cursor()
-
 
 
 @app.route('/')
