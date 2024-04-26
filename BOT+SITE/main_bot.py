@@ -1,4 +1,3 @@
-import os
 import sqlite3
 import logging
 import random
@@ -12,10 +11,8 @@ from telegram.ext import ApplicationBuilder
 from map import send_Img
 
 tracemalloc.start()
-# proxy_url = "socks5://user:pass@host:port"
-#
-# app = ApplicationBuilder().token("TOKEN").proxy_url(proxy_url).build()
 BOT_TOKEN = '6533161431:AAH_iqGGFB5Ulk75XwXgdwa4zM16e5ccYJs'
+
 # Запускаем логгирование
 logging.basicConfig(
     filename="bot.log", format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
@@ -49,7 +46,8 @@ def register(name=''):
 async def help(update, context):
     await update.message.reply_text(
         "Я бот с интересными вопросами. Отвечай на них - зарабатывай баллы! Чтобы начать нажми /start. "
-        "Если хочешь испугаться, нажми /address!")
+        "Если хочешь испугаться, нажми /address!"
+        "Если  захочешь увидеть рейтинг игроков, переходи на ниш сайт: https://youthful-flax-pasta.glitch.me")
 
 
 def check_points():
@@ -106,7 +104,8 @@ async def game(update, context):
     quiz = context.bot_data
     if quiz['bot_mode'] == 1:
         adr = update.message.text
-        quiz['bot_mode'] = 0
+        # quiz['bot_mode'] = 0
+        quiz['game_mode'] = 3
         await check_address(update, context, adr)
     if quiz['game_mode'] == 0:
         quiz['nick'] = update.message.text
@@ -135,19 +134,22 @@ async def game(update, context):
             result[0][0],
             reply_markup=markup
         )
-        quiz['counts_questions'] -= 1
+        # quiz['counts_questions'] -= 1
         quiz['degree'] = 1
         quiz['game_mode'] = 2
     if quiz['game_mode'] == 2:
         answer = update.message.text
+        quiz['counts_questions'] -= 1
+        print(answer, quiz['counts_questions'])
         # print('вывожу результат')
         await check_ans(update, answer, answer_options(), true_answer())
         true_answer(quiz['true_answer'])
         answer_options(quiz['ans1'], quiz['ans2'], quiz['ans3'], quiz['ans4'])
-    if quiz['counts_questions']:
-        quiz['game_mode'] = 1
-    else:
-        await stop(update, context)
+    if not quiz['bot_mode']:
+        if quiz['counts_questions']:
+            quiz['game_mode'] = 1
+        else:
+            await stop(update, context)
 
 
 async def stop(update, context):
@@ -161,14 +163,15 @@ async def stop(update, context):
     connection.close()
 
     await update.message.reply_text(
-        f'ИГРА ЗАКОНЧЕНА. Заработанных баллов: {n}. Статистику пользователей можно посмотреть по ссылке: http://www.yandex.ru/company',
+        f'ИГРА ЗАКОНЧЕНА. Заработанных баллов: {n}. Статистику пользователей можно посмотреть по ссылке:'
+        f' https://youthful-flax-pasta.glitch.me',
         reply_markup=ReplyKeyboardRemove()
     )
 
 
 async def site(update, context):
     await update.message.reply_text(
-        "Сайт: http://www.yandex.ru/company")
+        "Наш сайт: https://youthful-flax-pasta.glitch.me")
 
 
 async def address(update, context):
@@ -177,7 +180,8 @@ async def address(update, context):
     await update.message.reply_text("Скучно живете? Хочется больше щекотливых эмоций и адреналина в жизни?"
                                     " Вам к нам! Пришлите адрес своего дома, и мы отправим вам место, где вы живете! "
                                     "(Можно любое другое!)"
-                                    " Отправьте адрес в формате: 'Город, адрес, дом'")
+                                    " Отправьте адрес в формате: 'Город, адрес, дом'",
+                                    reply_markup=ReplyKeyboardRemove())
 
 
 async def check_address(update, context, adr):
